@@ -10,7 +10,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, ValidationError
 from typing import Optional
 
@@ -43,6 +43,11 @@ class StepRequest(BaseModel):
 
 
 # ─── HTTP Endpoints ───────────────────────────────────────────────────────────
+
+@app.get("/")
+def root():
+    return RedirectResponse("/web")
+
 
 @app.get("/health")
 def health():
