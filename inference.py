@@ -235,22 +235,23 @@ def run_episode(client: OpenAI, task_id: str) -> float:
             )
 
             if done:
-                # Extract final score from info
+                # Extract final score from info — clamp to open (0, 1) as
+                # required by the evaluation platform validator.
                 final_score = info.get("final_score")
                 if final_score is not None:
-                    score = float(final_score)
+                    score = max(0.001, min(0.999, float(final_score)))
                 break
 
-        # If not done, score by reward sum
+        # If not done, score by reward sum — clamp to open (0, 1)
         if score == 0.0 and rewards:
             max_r = TASK_MAX_REWARDS.get(task_id, 3.0)
-            score = min(max(sum(rewards) / max_r, 0.0), 1.0)
+            score = max(0.001, min(0.999, sum(rewards) / max_r))
 
         success = score >= SUCCESS_THRESHOLD
 
     except Exception as exc:
         print(f"[DEBUG] Episode error for {task_id}: {exc}", flush=True)
-        score = 0.0
+        score = 0.001  # clamp: platform rejects exact 0.0
         success = False
 
     finally:
