@@ -1,0 +1,28 @@
+# Virtual Environment
+metavenv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.tar.gz
+
+# Environment variables
+.env
+

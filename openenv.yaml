@@ -1,0 +1,112 @@
+name: contract-review-env
+version: "1.0.0"
+description: >
+  An OpenEnv-compliant RL environment where AI agents learn to review legal contracts.
+  Agents extract clauses, identify risks by severity, annotate sections, and produce
+  structured contract review reports — a real-world task performed by legal professionals daily.
+
+author: "OpenEnv Hackathon Team"
+tags:
+  - legal
+  - document-review
+  - nlp
+  - real-world
+  - contract
+  - risk-assessment
+
+tasks:
+  - id: task1
+    name: "Clause Extraction"
+    difficulty: easy
+    description: >
+      Extract all key clause types (confidentiality, term, governing law, dispute resolution)
+      from a standard NDA and identify their section numbers.
+    max_steps: 15
+    baseline_score: 0.68
+
+  - id: task2
+    name: "Risk Identification"
+    difficulty: medium
+    description: >
+      Review a SaaS subscription agreement and flag all risk issues with correct
+      severity levels (blocking/high/medium/low). Penalised for false positives.
+    max_steps: 20
+    baseline_score: 0.41
+
+  - id: task3
+    name: "Full Contract Redline"
+    difficulty: hard
+    description: >
+      Complete review of a complex employment agreement: extract all clauses, flag risks
+      by severity (must catch all blocking issues), approve clean sections, request
+      revision on problematic ones — within a 25-step budget.
+    max_steps: 25
+    baseline_score: 0.22
+
+action_space:
+  type: ContractAction
+  fields:
+    - name: action_type
+      type: string
+      enum: [extract_clause, flag_risk, annotate, approve_section, request_revision, submit_review]
+    - name: target_section
+      type: string
+      description: Section number being acted on
+    - name: content
+      type: string
+      description: Clause type or risk type identifier
+    - name: severity
+      type: string
+      enum: [low, medium, high, blocking]
+      required: false
+
+observation_space:
+  type: ContractObservation
+  fields:
+    - name: document_text
+      type: string
+    - name: document_type
+      type: string
+    - name: step_count
+      type: integer
+    - name: max_steps
+      type: integer
+    - name: steps_remaining
+      type: integer
+    - name: clauses_extracted
+      type: list
+    - name: flags_raised
+      type: list
+    - name: approved_sections
+      type: list
+    - name: last_action_reward
+      type: float
+    - name: cumulative_reward
+      type: float
+    - name: done
+      type: boolean
+    - name: message
+      type: string
+
+reward:
+  range: [-1.0, 1.0]
+  per_step: true
+  terminal_bonus: true
+  description: >
+    Dense reward signal: +0.18 for correct clause extraction with exact section,
+    +0.08 approximate section, +0.35×severity_weight for correct risk flag,
+    -0.12 false positive risk flag, +0.08 correct section approval,
+    -0.008 per step cost (efficiency incentive),
+    +0.6×final_score terminal bonus on submit.
+
+server:
+  framework: fastapi
+  port: 8000
+  websocket_endpoint: /ws
+  http_endpoints:
+    - GET /health
+    - POST /reset
+    - POST /step
+    - GET /state
+    - GET /web
+    - GET /docs
