@@ -818,18 +818,18 @@ Each WebSocket connection gets its own isolated environment instance.
 pip install -r requirements.txt
 
 # Start server
-uvicorn server.app:app --host 0.0.0.0 --port 8000 --reload
+uvicorn server.app:app --host 0.0.0.0 --port 7860 --reload
 
 # Health check
-curl http://localhost:8000/health
+curl http://localhost:7860/health
 
 # Reset an episode
-curl -X POST http://localhost:8000/reset \
+curl -X POST http://localhost:7860/reset \
   -H "Content-Type: application/json" \
   -d '{"task_id": "task1"}'
 
 # Send an action
-curl -X POST http://localhost:8000/step \
+curl -X POST http://localhost:7860/step \
   -H "Content-Type: application/json" \
   -d '{"action": {"action_type": "extract_clause",
                    "target_section": "2",
@@ -837,15 +837,15 @@ curl -X POST http://localhost:8000/step \
                    "severity": null}}'
 
 # Open Web UI
-open http://localhost:8000/web
+open http://localhost:7860/web
 ```
 
 ### Option B — Docker
 
 ```bash
 docker build -t contract-review-env .
-docker run -d -p 8000:8000 contract-review-env
-curl http://localhost:8000/health
+docker run -d -p 7860:7860 contract-review-env
+curl http://localhost:7860/health
 ```
 
 ### Option C — Python client loop
@@ -853,7 +853,7 @@ curl http://localhost:8000/health
 ```python
 import httpx
 
-base = "http://localhost:8000"
+base = "http://localhost:7860"
 client = httpx.Client()
 
 # Reset
@@ -884,7 +884,7 @@ The inference script uses the OpenAI-compatible Python client and works with Mis
 | `API_BASE_URL` | LLM API endpoint |
 | `MODEL_NAME` | Model identifier |
 | `HF_TOKEN` | API key for the LLM |
-| `ENV_BASE_URL` | Environment URL (default: `http://localhost:8000`) |
+| `ENV_BASE_URL` | Environment URL (default: `http://localhost:7860`) |
 | `PROVIDER` | Shortcut: `mistral` or `gemini` (sets defaults automatically) |
 
 ### With Mistral AI (free tier)
@@ -895,7 +895,7 @@ export PROVIDER=mistral
 export HF_TOKEN=your_mistral_api_key
 
 # Start environment in a separate terminal
-uvicorn server.app:app --port 8000
+uvicorn server.app:app --port 7860
 
 # Run inference
 python inference.py
@@ -1140,13 +1140,13 @@ The sharp score signal on blocking risks (gate at 0.15 if missed) makes the agen
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `HOST` | `0.0.0.0` | Server bind address |
-| `PORT` | `8000` | Server port |
+| `PORT` | `7860` | Server port |
 | `WORKERS` | `2` | Uvicorn worker processes |
 | `MAX_CONCURRENT_ENVS` | `100` | Max WebSocket sessions per worker |
 | `API_BASE_URL` | — | LLM API endpoint (inference.py) |
 | `MODEL_NAME` | — | LLM model identifier (inference.py) |
 | `HF_TOKEN` | — | API key for LLM (inference.py) |
-| `ENV_BASE_URL` | `http://localhost:8000` | Environment base URL (inference.py) |
+| `ENV_BASE_URL` | `http://localhost:7860` | Environment base URL (inference.py) |
 | `PROVIDER` | `mistral` | Shortcut: `mistral` or `gemini` |
 
 ---
