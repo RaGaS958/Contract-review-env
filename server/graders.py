@@ -217,7 +217,10 @@ def grade_task3(
 def grade_episode(task_id: str, state: Any, ground_truth: Dict[str, Any]) -> float:
     """
     Dispatch to the correct grader based on task_id.
-    Returns float in [0.0, 1.0].
+
+    Individual graders return true [0.0, 1.0] scores so integrity tests pass.
+    The dispatcher clamps the final submitted score to the open interval (0, 1)
+    because the evaluation platform rejects exact 0.0 and 1.0 as out-of-range.
     """
     agent_clauses = [
         {"clause_type": c.clause_type, "section": c.section}
@@ -229,13 +232,11 @@ def grade_episode(task_id: str, state: Any, ground_truth: Dict[str, Any]) -> flo
     ]
 
     if task_id == "task1":
-        return grade_task1(agent_clauses, ground_truth.get("clauses", []))
-
-    if task_id == "task2":
-        return grade_task2(agent_flags, ground_truth.get("risks", []))
-
-    if task_id == "task3":
-        return grade_task3(
+        raw = grade_task1(agent_clauses, ground_truth.get("clauses", []))
+    elif task_id == "task2":
+        raw = grade_task2(agent_flags, ground_truth.get("risks", []))
+    elif task_id == "task3":
+        raw = grade_task3(
             agent_clauses=agent_clauses,
             agent_flags=agent_flags,
             approved_sections=state.approved_sections,
@@ -244,5 +245,9 @@ def grade_episode(task_id: str, state: Any, ground_truth: Dict[str, Any]) -> flo
             max_steps=state.max_steps,
             ground_truth=ground_truth,
         )
+    else:
+        raise ValueError(f"Unknown task_id: {task_id}")
 
-    raise ValueError(f"Unknown task_id: {task_id}")
+    # Clamp to open interval (0, 1) — platform rejects exact 0.0 and 1.0.
+    # Individual graders remain pure so integrity tests continue to pass.
+    return round(max(0.001, min(0.999, raw)), 4)
