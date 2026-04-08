@@ -50,7 +50,7 @@ API_KEY: str      = os.environ.get("HF_TOKEN",
                         os.environ.get("GEMINI_API_KEY",
                           os.environ.get("OPENAI_API_KEY", "dummy"))))
 
-ENV_BASE_URL: str = os.environ.get("ENV_BASE_URL", "http://localhost:8000")
+ENV_BASE_URL: str = os.environ.get("ENV_BASE_URL", "http://localhost:7860")
 BENCHMARK: str    = "contract-review-env"
 MAX_STEPS: int    = 20
 SUCCESS_THRESHOLD: float = 0.5
