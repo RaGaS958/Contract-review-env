@@ -26,7 +26,7 @@ ENV PORT=8000
 ENV WORKERS=2
 ENV MAX_CONCURRENT_ENVS=100
 
-EXPOSE 8000
+EXPOSE 7860
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
